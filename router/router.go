@@ -15,9 +15,9 @@ func SetupRouter() *gin.Engine {
 
 	router.GET("/books", controller.GetBooks(database.Database))
 
-	router.POST("/books/:id", controller.UpdateBook(database.Database))
-
 	router.GET("/book/:id", controller.GetBook(database.Database))
+
+	router.POST("/books/:id", controller.UpdateBook(database.Database))
 
 	router.DELETE("/books/:id", controller.DeleteBook(database.Database))
 

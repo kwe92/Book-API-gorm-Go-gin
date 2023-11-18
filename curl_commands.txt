@@ -1,23 +1,36 @@
+------------------------GET ALL BOOKS------------------------
+
 curl -i -H "Content-Type: application/json" \
     -X GET \
-    http://localhost:8000/books
+    http://localhost:8080/books
 
-    curl -i -H "Content-Type: application/json" \
+-------------------------------------------------------------
+------------------------GET SINGLE BOOK----------------------
+
+curl -i -H "Content-Type: application/json" \
+    -X GET \
+    http://localhost:8080/book/6
+    
+-------------------------------------------------------------
+------------------------CREATE BOOK--------------------------
+
+curl -i -H "Content-Type: application/json" \
     -X POST \
     -d '{"title":"Beginners Mind","author":"Shunryu Suzuki"}'\
-    http://localhost:8000/book
+    http://localhost:8080/book
     
+-------------------------------------------------------------
+------------------------UPDATE BOOK--------------------------
 
 
-    curl -i -H "Content-Type: application/json" \
+curl -i -H "Content-Type: application/json" \
     -X POST \
     -d '{"title":"Meditations","author":"Marcus Aurelius"}'\
-    http://localhost:8000/books/1
+    http://localhost:8080/books/6
+
+-------------------------------------------------------------
+------------------------DELETE BOOK--------------------------
 
 curl -i -H "Content-Type: application/json" \
     -X DELETE \
-    http://localhost:8000/books/1
-
-    curl -i -H "Content-Type: application/json" \
-    -X GET \
-    http://localhost:8000/book/2
+    http://localhost:8080/books/7
