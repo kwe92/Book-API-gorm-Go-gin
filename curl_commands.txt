@@ -1,0 +1,23 @@
+curl -i -H "Content-Type: application/json" \
+    -X GET \
+    http://localhost:8000/books
+
+    curl -i -H "Content-Type: application/json" \
+    -X POST \
+    -d '{"title":"Beginners Mind","author":"Shunryu Suzuki"}'\
+    http://localhost:8000/book
+    
+
+
+    curl -i -H "Content-Type: application/json" \
+    -X POST \
+    -d '{"title":"Meditations","author":"Marcus Aurelius"}'\
+    http://localhost:8000/books/1
+
+curl -i -H "Content-Type: application/json" \
+    -X DELETE \
+    http://localhost:8000/books/1
+
+    curl -i -H "Content-Type: application/json" \
+    -X GET \
+    http://localhost:8000/book/2
