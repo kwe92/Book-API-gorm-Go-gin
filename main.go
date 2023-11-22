@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	database.ConnectAndLoad()
+	database.ConnectAndMigrate()
 
 	router := router.SetupRouter()
 

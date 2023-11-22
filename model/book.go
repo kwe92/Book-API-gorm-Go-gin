@@ -102,6 +102,14 @@ func FindBookById(db *gorm.DB, id string) (Book, error) {
 	return book, nil
 }
 
+// TODO: Add comments
+
+// Batch Insert
+
+// Updating Records
+
+// Deleting Records
+
 // Locating Single Records
 
 //   - use db.First or db.Limit(1).Find

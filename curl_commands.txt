@@ -9,7 +9,7 @@ curl -i -H "Content-Type: application/json" \
 
 curl -i -H "Content-Type: application/json" \
     -X GET \
-    http://localhost:8080/book/6
+    http://localhost:8080/book/9
     
 -------------------------------------------------------------
 ------------------------CREATE BOOK--------------------------
@@ -18,6 +18,14 @@ curl -i -H "Content-Type: application/json" \
     -X POST \
     -d '{"title":"Beginners Mind","author":"Shunryu Suzuki"}'\
     http://localhost:8080/book
+
+    -------------------------------------------------------------
+------------------------CREATE BOOKS--------------------------
+
+curl -i -H "Content-Type: application/json" \
+    -X POST \
+    -d '[{"title":"Beginners Mind","author":"Shunryu Suzuki"}, {"title":"Meditations","author":"Marcus Aurelius"}, {"title":"underworlds","author":"Thames & Hudson"}]'\
+    http://localhost:8080/books
     
 -------------------------------------------------------------
 ------------------------UPDATE BOOK--------------------------
@@ -25,12 +33,12 @@ curl -i -H "Content-Type: application/json" \
 
 curl -i -H "Content-Type: application/json" \
     -X POST \
-    -d '{"title":"Meditations","author":"Marcus Aurelius"}'\
-    http://localhost:8080/books/6
+    -d '{"title":"Think and Grow Rich","author":"Napoleon Hill"}'\
+    http://localhost:8080/books/3
 
 -------------------------------------------------------------
 ------------------------DELETE BOOK--------------------------
 
 curl -i -H "Content-Type: application/json" \
     -X DELETE \
-    http://localhost:8080/books/7
+    http://localhost:8080/books/13
