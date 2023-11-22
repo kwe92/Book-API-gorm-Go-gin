@@ -13,6 +13,8 @@ func SetupRouter() *gin.Engine {
 
 	router.POST("/book", controller.CreateBook(database.Database))
 
+	router.POST("/books", controller.CreateBooks(database.Database))
+
 	router.GET("/books", controller.GetBooks(database.Database))
 
 	router.GET("/book/:id", controller.GetBook(database.Database))
