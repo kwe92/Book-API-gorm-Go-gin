@@ -5,11 +5,21 @@ curl -i -H "Content-Type: application/json" \
     http://localhost:8080/books
 
 -------------------------------------------------------------
-------------------------GET SINGLE BOOK----------------------
+------------------------GET SINGLE BOOK BY ID----------------
 
 curl -i -H "Content-Type: application/json" \
     -X GET \
-    http://localhost:8080/book/9
+    http://localhost:8080/book/4
+
+
+-------------------------------------------------------------
+------------------------GET SINGLE BOOK BY TITLE-------------
+curl -i -H "Content-Type: application/json" \
+    -X GET \
+    http://localhost:8080/book/bytitle/Meditations
+
+
+   
     
 -------------------------------------------------------------
 ------------------------CREATE BOOK--------------------------
@@ -19,7 +29,7 @@ curl -i -H "Content-Type: application/json" \
     -d '{"title":"Beginners Mind","author":"Shunryu Suzuki"}'\
     http://localhost:8080/book
 
-    -------------------------------------------------------------
+-------------------------------------------------------------
 ------------------------CREATE BOOKS--------------------------
 
 curl -i -H "Content-Type: application/json" \
@@ -27,6 +37,14 @@ curl -i -H "Content-Type: application/json" \
     -d '[{"title":"Beginners Mind","author":"Shunryu Suzuki"}, {"title":"Meditations","author":"Marcus Aurelius"}, {"title":"underworlds","author":"Thames & Hudson"}]'\
     http://localhost:8080/books
     
+
+-------------------------------------------------------------
+------------------------CREATE BOOKS 2--------------------------
+
+curl -i -H "Content-Type: application/json" \
+    -X POST \
+    -d '[{"title":"B","author":"B"}, {"title":"A","author":"A"}, {"title":"A","author":"B"}, {"title":"C","author":"A"}, {"title":"B","author":"A"}]'\
+    http://localhost:8080/books
 -------------------------------------------------------------
 ------------------------UPDATE BOOK--------------------------
 
@@ -35,6 +53,16 @@ curl -i -H "Content-Type: application/json" \
     -X POST \
     -d '{"title":"Think and Grow Rich","author":"Napoleon Hill"}'\
     http://localhost:8080/books/3
+
+
+-------------------------------------------------------------
+------------------------UPDATE BOOK 2--------------------------
+
+
+curl -i -H "Content-Type: application/json" \
+    -X POST \
+    -d '{"title":"X","author":"Z"}'\
+    http://localhost:8080/books/1
 
 -------------------------------------------------------------
 ------------------------DELETE BOOK--------------------------

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -9,17 +10,17 @@ import (
 )
 
 // Books: Slice of pointers to Book type for batch insert into database
-type Books []*Book
+type Books []Book
 
 // Save: insert data from model into database
 func (books *Books) Save(db *gorm.DB) (Books, error) {
 
 	var result *gorm.DB
 
-	// batch insert will invoke all implemented hooks for the model inserted
-	// can skip hooks with &gorm.Session
+	// batch insert all records and invoke all hooks
+	// can skip hook invocation with &gorm.Session
 	if result = db.Session(&gorm.Session{SkipHooks: true}).Create(books); result.Error != nil {
-		return []*Book{}, result.Error
+		return []Book{}, result.Error
 	}
 
 	return *books, nil
@@ -93,10 +94,32 @@ func FindBookById(db *gorm.DB, id string) (Book, error) {
 
 	var book Book
 
+	// query with struct in where clause
 	if err := db.Limit(1).Where("id = ?", id).Find(&book).Error; err != nil {
 
 		return Book{}, err
 
+	}
+	if book.ID == 0 {
+		return Book{}, errors.New(fmt.Sprintf("could not find a book with the id: %s", id))
+	}
+
+	return book, nil
+}
+
+func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
+
+	var book Book
+
+	// query with struct in where clause
+	if err := db.Limit(1).Where(&Book{Title: title}).Find(&book).Error; err != nil {
+
+		return Book{}, err
+
+	}
+
+	if book.Title == "" {
+		return Book{}, errors.New(fmt.Sprintf("could not find a book with the title: %s", title))
 	}
 
 	return book, nil
@@ -111,6 +134,24 @@ func FindBookById(db *gorm.DB, id string) (Book, error) {
 // Deleting Records
 
 // Locating Single Records
+
+// Selecting Specific Fields (Columns) | *gorm.Select(coulmn_1, coulmn_2, ..., coulmn_n)
+
+//   -  if you omit the Select method when querying
+//      gorm selects all fields / columns by e.g. SELECT * FROM table_name;
+
+// Destination Types
+
+// - struct, slice, map[string] interface{}
+
+// Query Types
+
+//   - raw query string
+//   - iterpolated query string
+//   - struct query //! note: zero values are ommited from the struct query string unless you specify struct search fields
+//   - map[string] interface{} query
+
+// Query Single Records
 
 //   - use db.First or db.Limit(1).Find
 //   - do not use db.Find without method chaining Limit(1)

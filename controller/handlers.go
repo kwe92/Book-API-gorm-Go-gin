@@ -72,13 +72,13 @@ func CreateBooks(db *gorm.DB) gin.HandlerFunc {
 		// for each object instantiate new object from expected input
 		// assign the new object to created array at index i
 		for i, bookInput := range booksInput {
-			books[i] = &model.Book{
+			books[i] = model.Book{
 				Title:  bookInput.Title,
 				Author: bookInput.Author,
 			}
 		}
 
-		// call Save method on object to insert all records into the database
+		// call Save method on object to insert all records into database
 		if savedBooks, err := books.Save(db); err != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -98,17 +98,18 @@ func GetBooks(db *gorm.DB) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
-		var books []model.Book
+		// declare destination slice
+		var books model.Books
 
-		// select all records and load entire table into slice of model object
-		if err := db.Find(&books).Error; err != nil {
+		// select all records and load into destination slice
+		if err := db.Order("author asc, title asc").Find(&books).Error; err != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"data": books})
+		ctx.IndentedJSON(http.StatusOK, gin.H{"data": books})
 	}
 }
 
@@ -117,10 +118,35 @@ func GetBook(db *gorm.DB) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
+		// declare destination struct
 		var book model.Book
 
-		// find the first record that matches the Where clause
-		if err := db.Where("id = ?", ctx.Param("id")).First(&book).Error; err != nil {
+		var err error
+
+		// find first record matching Where clause and load into destination struct
+		if book, err = model.FindBookById(db, ctx.Param("id")); err != nil {
+
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"data": book})
+	}
+}
+
+// / GetBooks: http handler that retreives a single book from database
+func GetBookByTitle(db *gorm.DB) gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+
+		// declare destination struct
+		var book model.Book
+
+		var err error
+
+		// find first record matching Where clause and load into destination struct
+		if book, err = model.FindBookByTitle(db, ctx.Param("title")); err != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -139,10 +165,10 @@ func UpdateBook(db *gorm.DB) gin.HandlerFunc {
 		// expected request input struct
 		var updateBookInput model.UpdateBookInput
 
-		// declare model struct variable
+		// declare destination struct
 		var book model.Book
 
-		// find the record you want to update and load record into model struct variable
+		// find record to update and load record into destination struct
 		if err := db.Where("id = ?", ctx.Param("id")).Find(&book).Error; err != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -178,7 +204,7 @@ func DeleteBook(db *gorm.DB) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
-		// find record you want to delete and load record into model struct variable
+		// find record to delete and load record into destination struct
 		if book, err := model.FindBookById(db, ctx.Param("id")); err != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
