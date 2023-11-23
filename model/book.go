@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -62,14 +64,24 @@ func (book *Book) Update(db *gorm.DB, input UpdateBookInput) (*Book, error) {
 
 	var result *gorm.DB
 
-	// specify model you would like to perfom operations on and update record
+	// specify model you want to perfom operations on and update record
 	if result = db.Model(book).Updates(input); result.Error != nil {
 
 		return &Book{}, result.Error
 
 	}
 
-	log.Printf("updated book from: %+v to: %+v\n\n", originalBook, *book)
+	log.Printf(
+		"updated book from: %+v to: %+v\n\n",
+		gin.H{
+			"title":  originalBook.Title,
+			"author": originalBook.Author,
+		},
+		gin.H{
+			"title":  book.Title,
+			"author": book.Author,
+		},
+	)
 
 	log.Println("rows affected:", result.RowsAffected)
 
@@ -111,11 +123,14 @@ func FindBookById(db *gorm.DB, id string) (Book, error) {
 // FindBookByTitle: query database for book record with given title
 func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 
+	filteredTitle := strings.Replace(title, "-", " ", -1)
+	filteredTitle = strings.Replace(filteredTitle, "_", " ", -1)
+
 	// destination struct pointer
 	var book Book
 
 	// query with struct in where clause
-	if err := db.Limit(1).Where(&Book{Title: title}).Find(&book).Error; err != nil {
+	if err := db.Limit(1).Where(&Book{Title: filteredTitle}).Find(&book).Error; err != nil {
 
 		return Book{}, err
 
@@ -123,7 +138,7 @@ func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 
 	// if destinaion struct has zero-value for title return not found to client
 	if book.Title == "" {
-		return Book{}, errors.New(fmt.Sprintf("could not find a book with the title: %s", title))
+		return Book{}, errors.New(fmt.Sprintf("could not find a book with the title: %s", filteredTitle))
 	}
 
 	return book, nil

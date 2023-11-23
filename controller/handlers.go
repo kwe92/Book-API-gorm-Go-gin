@@ -222,7 +222,11 @@ func DeleteBook(db *gorm.DB) gin.HandlerFunc {
 
 			} else {
 				// return deleted object with DeletedAt time
-				ctx.JSON(http.StatusOK, gin.H{"deleted_book": deletedBook})
+				ctx.JSON(http.StatusOK, gin.H{"deleted_book": gin.H{
+					"title":     deletedBook.Title,
+					"author":    deletedBook.Author,
+					"DeletedAt": deletedBook.DeletedAt,
+				}})
 
 			}
 
