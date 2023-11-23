@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -17,8 +16,8 @@ func (books *Books) Save(db *gorm.DB) (Books, error) {
 
 	var result *gorm.DB
 
-	// batch insert all records and invoke all hooks
-	// can skip hook invocation with &gorm.Session
+	// batch insert records and invoke hooks
+	// skip hook invocation with &gorm.Session
 	if result = db.Session(&gorm.Session{SkipHooks: true}).Create(books); result.Error != nil {
 		return []Book{}, result.Error
 	}
@@ -56,12 +55,14 @@ func (book *Book) BeforeSave(*gorm.DB) error {
 
 }
 
+// Update: updates data for the associated book record in database
 func (book *Book) Update(db *gorm.DB, input UpdateBookInput) (*Book, error) {
 
 	originalBook := *book
 
 	var result *gorm.DB
 
+	// specify model you would like to perfom operations on and update record
 	if result = db.Model(book).Updates(input); result.Error != nil {
 
 		return &Book{}, result.Error
@@ -76,30 +77,30 @@ func (book *Book) Update(db *gorm.DB, input UpdateBookInput) (*Book, error) {
 
 }
 
+// Delete: remove book record from database
 func (book *Book) Delete(db *gorm.DB) (*Book, error) {
-
-	deletedBook := book
 
 	if err := db.Delete(&book).Error; err != nil {
 
 		return &Book{}, err
 	}
 
-	deletedBook.DeletedAt.Time = time.Now()
-
-	return deletedBook, nil
+	return book, nil
 }
 
+// FindBookById: query database for book record with given id
 func FindBookById(db *gorm.DB, id string) (Book, error) {
 
+	// destination struct pointer
 	var book Book
 
-	// query with struct in where clause
+	// query with format string in where clause
 	if err := db.Limit(1).Where("id = ?", id).Find(&book).Error; err != nil {
 
 		return Book{}, err
 
 	}
+	// if destinaion struct has zero-value for id return not found to client
 	if book.ID == 0 {
 		return Book{}, errors.New(fmt.Sprintf("could not find a book with the id: %s", id))
 	}
@@ -107,8 +108,10 @@ func FindBookById(db *gorm.DB, id string) (Book, error) {
 	return book, nil
 }
 
+// FindBookByTitle: query database for book record with given title
 func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 
+	// destination struct pointer
 	var book Book
 
 	// query with struct in where clause
@@ -118,6 +121,7 @@ func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 
 	}
 
+	// if destinaion struct has zero-value for title return not found to client
 	if book.Title == "" {
 		return Book{}, errors.New(fmt.Sprintf("could not find a book with the title: %s", title))
 	}
@@ -125,29 +129,36 @@ func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 	return book, nil
 }
 
-// TODO: Add comments
-
 // Batch Insert
+
+//   - passing a Slice to Create method inserts multiple records of a model
+//   - skip hook invocation with Session(&gorm.Session{SkipHooks: true})
 
 // Updating Records
 
+//   - Update method: updates a single field / column
+//   - Updates method: updates multiple fields / columns
+
 // Deleting Records
 
-// Locating Single Records
+//   - Delete method: deletes record and assigns value to DeletedAt in destination struct
 
-// Selecting Specific Fields (Columns) | *gorm.Select(coulmn_1, coulmn_2, ..., coulmn_n)
+// Selecting Specific Fields (Columns)
 
+//   - *gorm.Select(coulmn_1, coulmn_2, ..., coulmn_n)
 //   -  if you omit the Select method when querying
-//      gorm selects all fields / columns by e.g. SELECT * FROM table_name;
+//      gorm selects all fields / columns by default e.g. SELECT * FROM table_name;
 
 // Destination Types
 
-// - struct, slice, map[string] interface{}
+//   - struct: single record
+//   - slice: multiple records, invokes hooks unless explicitly turned off
+//   - map[string] interface{}: single record without invoking hooks
 
 // Query Types
 
 //   - raw query string
-//   - iterpolated query string
+//   - formatted query string
 //   - struct query //! note: zero values are ommited from the struct query string unless you specify struct search fields
 //   - map[string] interface{} query
 
@@ -159,6 +170,6 @@ func FindBookByTitle(db *gorm.DB, title string) (Book, error) {
 
 // uniqueIndex
 
-//   - a struct tag that creates and index contraints
+//   - struct tag that creates index contraints
 //   - if fields have the same uniqueIndex value
-//   - that section of the table must be unique
+//   - the composition of those fields must be unique
